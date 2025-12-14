@@ -1,0 +1,41 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: Go
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+
+    - name: Set up Go
+      uses: actions/setup-go@v6.1.0
+      with:
+        go-version: '1.25.5'
+
+    - name: Cache Go Modules
+      uses: actions/cache@v5.0.1
+      with:
+        # 缓存 Go Modules 存放的目录（GOMODCACHE 变量指向的地方）
+        path: |
+          ~/go/pkg/mod
+          ~/.cache/go-build
+        # key 决定缓存是否命中。我们使用 go.sum 的 hash 值，只要 go.sum 变化，key 就会变化，缓存就会失效并重新下载。
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        # restore-keys 用于在精确 key 未命中时，尝试使用较老的缓存（例如 go.sum 略有变动）
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: Build
+      run: go build -v ./...
+
+    - name: Test
+      run: go test -v ./...
