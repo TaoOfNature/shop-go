@@ -1,0 +1,63 @@
+### Go 编译/构建产物 ###
+# 忽略可执行文件和测试缓存
+*.exe
+*.dll
+*.so
+*.dylib
+
+# 忽略临时对象文件
+*.o
+*.obj
+
+# 忽略构建缓存目录 (Go 1.10+)
+/go.build.cache
+__debug_bin
+
+# 忽略测试缓存和覆盖率报告
+*_test
+*.test
+/coverage.html
+
+# 忽略 Go 工具链生成的文档
+/doc/
+
+### 依赖和模块相关 ###
+# 如果您使用 go mod vendor 来管理依赖（Go 推荐做法是跳过此项，让 Go Modules 自动处理），则忽略 vendor 目录
+# /vendor/ 
+
+# 忽略 Go Module 缓存，如果不在项目根目录
+/pkg/
+
+### IDE 和编辑器配置 ###
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history
+
+# JetBrains IDEs (Goland, IntelliJ IDEA)
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Vim/Nano 临时文件
+*~
+
+### 操作系统临时文件 ###
+# macOS
+.DS_Store
+
+# Windows 缩略图缓存
+Thumbs.db
+
+### 运行时和日志文件 ###
+# 日志文件
+*.log
+
+# 敏感文件（例如本地配置文件、数据库连接）
+# 推荐将 .env 文件加入忽略，然后提供一个 .env.example 模板文件
+.env
+.env.*
