@@ -1,0 +1,7 @@
+FROM golang:1.25.5-alpine
+ARG GOPROXY
+ENV GOPROXY=$GOPROXY
+WORKDIR "/app"
+EXPOSE 8080
+VOLUME [ "/app","/go/pkg","/root/.cache/go-build" ]
+CMD ["tail", "-f", "/dev/null"]

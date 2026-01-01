@@ -15,7 +15,7 @@ func main() {
 	r.GET("/ping", func(c *gin.Context) {
 		// Return JSON response
 		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
+			"code":200,"message": "pong","user":"{token:\"123123\",}",
 		})
 	})
 

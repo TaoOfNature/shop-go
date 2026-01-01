@@ -1,0 +1,63 @@
+version: "3.8"
+
+services:
+  db:
+    image: bitnami/postgresql:2026.01.01
+    container_name: db
+    networks:
+      - internal_network
+    environment:
+      - POSTGRESQL_USERNAME=${DB_USER}
+      - POSTGRESQL_PASSWORD=${DB_PASS}
+      - POSTGRESQL_DATABASE=${DB_NAME}
+    ports:
+      - "54321:5432"
+    restart: always
+    volumes:
+      - "/root/data/postgresql:/bitnami/postgresql"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  server:
+    container_name: go
+    networks:
+      - internal_network
+    build:
+      context: .
+      dockerfile: dockerfile
+      args:
+        - GOPROXY=https://goproxy.cn,direct
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_NAME=${DB_NAME}
+      - DB_HOST=db
+      - DB_PORT=5432
+    volumes:
+      - "/root/data/go/shop-go:/app"
+      - "/root/data/go/pkg:/go/pkg"
+      - "/root/data/go/cache:/root/.cache/go-build"
+
+  nginx:
+    image: nginx:1.29.4-alpine
+    container_name: nginx
+    networks:
+      - internal_network
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: always
+    volumes:
+      - "/root/data/nginx/html:/usr/share/nginx/html"
+      - "/root/data/nginx/nginx.conf:/etc/nginx/nginx.conf:ro"
+
+networks:
+  internal_network:
+    driver: bridge
