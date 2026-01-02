@@ -1,8 +1,7 @@
-version: "3.8"
 
 services:
   db:
-    image: bitnami/postgresql:2026.01.01
+    image: crpi-57t10gj4eavw45nx-vpc.cn-beijing.personal.cr.aliyuncs.com/bey0nd/postgresql:2026.01.01
     container_name: db
     networks:
       - internal_network
@@ -22,7 +21,7 @@ services:
       retries: 5
 
   server:
-    image: golang:1.25.5-alpine
+    image: crpi-57t10gj4eavw45nx-vpc.cn-beijing.personal.cr.aliyuncs.com/bey0nd/golang:1.25.5-alpine
     container_name: go
     networks:
       - internal_network
@@ -44,7 +43,7 @@ services:
       sh -c "cd /app && go build -o main . && ./main"
 
   nginx:
-    image: nginx:1.29.4-alpine
+    image: crpi-57t10gj4eavw45nx-vpc.cn-beijing.personal.cr.aliyuncs.com/bey0nd/nginx:1.29.4-alpine
     container_name: nginx
     networks:
       - internal_network
