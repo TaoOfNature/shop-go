@@ -49,6 +49,7 @@ jobs:
         script: |
           cd /root/data/go/shop-go
           git pull origin main
+          cp /docker/nginx.conf /root/data/nginx/
 
           # 1. 声明环境变量（仅在本次 SSH 会话有效）
           export DB_USER=${{ secrets.DB_USER }}
