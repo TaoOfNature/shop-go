@@ -39,3 +39,23 @@ jobs:
 
     # - name: Test
     #   run: go test -v ./...
+    - name: deploy
+      uses: appleboy/ssh-action@v1
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        # 关键点：直接 export 变量，然后启动 compose
+        script: |
+          cd /root/data/go/shop-go
+          git pull origin main
+
+          # 1. 声明环境变量（仅在本次 SSH 会话有效）
+          export DB_USER=${{ secrets.DB_USER }}
+          export DB_PASS=${{ secrets.DB_PASS }}
+          export DB_NAME=${{ secrets.DB_NAME }}
+
+          # 2. 启动 Compose
+          # Compose 会自动识别 shell 里的这些变量并填入 yaml
+          cd docker
+          docker-compose up -d --build
