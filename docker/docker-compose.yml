@@ -40,7 +40,7 @@ services:
       - "/root/data/go/cache:/root/.cache/go-build"
     working_dir: "/app"
     command: >
-      sh -c "cd /app && go build -o main . && ./main"
+      sh -c "cd /app/cmd/web && go build -o main . && ./main"
 
   nginx:
     image: crpi-57t10gj4eavw45nx-vpc.cn-beijing.personal.cr.aliyuncs.com/bey0nd/nginx:1.29.4-alpine
