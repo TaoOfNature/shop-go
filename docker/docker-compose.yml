@@ -1,7 +1,7 @@
 
 services:
   db:
-    image: crpi-57t10gj4eavw45nx-vpc.cn-beijing.personal.cr.aliyuncs.com/bey0nd/postgresql:2026.01.01
+    image: crpi-57t10gj4eavw45nx-vpc.cn-beijing.personal.cr.aliyuncs.com/bey0nd/postgresql:latest
     container_name: db
     networks:
       - internal_network
