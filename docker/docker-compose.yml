@@ -20,6 +20,15 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:8-alpine
+    container_name: redis
+    networks:
+      - internal_network
+    ports:
+      - "6379:6379"
+    restart: always
+
   server:
     image: crpi-57t10gj4eavw45nx-vpc.cn-beijing.personal.cr.aliyuncs.com/bey0nd/golang:1.25.5-alpine
     container_name: go
@@ -30,9 +39,15 @@ services:
       db:
         condition: service_healthy
     environment:
+      - APP_PORT=8080
       - DB_USER=${DB_USER}
       - DB_PASS=${DB_PASS}
       - DB_NAME=${DB_NAME}
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_SSLMODE=disable
+      - REDIS_ADDR=redis:6379
+      - JWT_SECRET=${JWT_SECRET:-change-me}
       - GOPROXY=https://goproxy.cn,direct
     volumes:
       - "/root/data/go/shop-go:/app"
@@ -40,7 +55,7 @@ services:
       - "/root/data/go/cache:/root/.cache/go-build"
     working_dir: "/app"
     command: >
-      sh -c "cd /app/cmd/web && go build -o main . && ./main"
+      sh -c "cd /app/cmd/server && go build -o main . && ./main"
 
   nginx:
     image: crpi-57t10gj4eavw45nx-vpc.cn-beijing.personal.cr.aliyuncs.com/bey0nd/nginx:1.29.4-alpine

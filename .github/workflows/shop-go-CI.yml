@@ -55,6 +55,7 @@ jobs:
           export DB_USER=${{ secrets.DB_USER }}
           export DB_PASS=${{ secrets.DB_PASS }}
           export DB_NAME=${{ secrets.DB_NAME }}
+          export JWT_SECRET=${{ secrets.JWT_SECRET }}
 
           # 2. 启动 Compose
           # Compose 会自动识别 shell 里的这些变量并填入 yaml
