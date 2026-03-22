@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/TaoOfNature/shop-go/internal/model"
+	"github.com/dawnstack/shop-go/internal/model"
 )
 
 type ProductRepository struct {

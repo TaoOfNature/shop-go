@@ -1,5 +1,6 @@
 services:
   db:
+    container_name: mall-db
     image: bitnami/postgresql:latest
     environment:
       POSTGRESQL_USERNAME: ${DB_USER:-postgres}
@@ -8,7 +9,7 @@ services:
     ports:
       - "54321:5432"
     volumes:
-      - external_data:/bitnami/postgresql
+      - postgresql:/bitnami/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-mall}"]
       interval: 10s
@@ -16,14 +17,16 @@ services:
       retries: 10
 
   redis:
+    container_name: mall-redis
     image: redis:8.6.1
     ports:
       - "6379:6379"
     volumes:
-      - external_data:/redis/data
+      - redis:/data
     command: ["redis-server", "--appendonly", "yes"]
 
   server:
+    container_name: mall-server
     image: golang:1.26.1
     working_dir: /workspace
     depends_on:
@@ -48,7 +51,7 @@ services:
       GOCACHE: /golang/.pkg/build
     volumes:
       - ..:/workspace
-      - external_data:/golang/.pkg
+      - golang:/golang/.pkg
     command: >
       sh -c "
         go mod tidy &&
@@ -60,5 +63,9 @@ services:
       - "8080:8080"
 
 volumes:
-  external_data:
+  golang:
+    external: true
+  postgresql:
+    external: true
+  redis:
     external: true

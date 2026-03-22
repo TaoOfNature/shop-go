@@ -1,11 +1,11 @@
 package service
 
 import (
-	"github.com/TaoOfNature/shop-go/internal/cache"
-	"github.com/TaoOfNature/shop-go/internal/config"
-	"github.com/TaoOfNature/shop-go/internal/pkg/auth"
-	"github.com/TaoOfNature/shop-go/internal/pkg/snowflake"
-	"github.com/TaoOfNature/shop-go/internal/repository"
+	"github.com/dawnstack/shop-go/internal/cache"
+	"github.com/dawnstack/shop-go/internal/config"
+	"github.com/dawnstack/shop-go/internal/pkg/auth"
+	"github.com/dawnstack/shop-go/internal/pkg/snowflake"
+	"github.com/dawnstack/shop-go/internal/repository"
 )
 
 type Services struct {

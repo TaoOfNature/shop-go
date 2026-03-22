@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/TaoOfNature/shop-go/internal/config"
+	"github.com/dawnstack/shop-go/internal/config"
 )
 
 func TestRedisCacheSetGetDelete(t *testing.T) {

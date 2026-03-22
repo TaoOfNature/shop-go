@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/TaoOfNature/shop-go/internal/config"
+	"github.com/dawnstack/shop-go/internal/config"
 )
 
 type RedisCache struct {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/TaoOfNature/shop-go/internal/model"
+	"github.com/dawnstack/shop-go/internal/model"
 )
 
 type HomeRepository struct {

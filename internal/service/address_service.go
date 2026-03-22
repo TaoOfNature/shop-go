@@ -3,9 +3,9 @@ package service
 import (
 	"context"
 
-	"github.com/TaoOfNature/shop-go/internal/model"
-	"github.com/TaoOfNature/shop-go/internal/pkg/snowflake"
-	"github.com/TaoOfNature/shop-go/internal/repository"
+	"github.com/dawnstack/shop-go/internal/model"
+	"github.com/dawnstack/shop-go/internal/pkg/snowflake"
+	"github.com/dawnstack/shop-go/internal/repository"
 )
 
 type AddressService struct {

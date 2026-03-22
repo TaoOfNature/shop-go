@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/TaoOfNature/shop-go/internal/pkg/response"
+	"github.com/dawnstack/shop-go/internal/pkg/response"
 	"github.com/gin-gonic/gin"
 )
 

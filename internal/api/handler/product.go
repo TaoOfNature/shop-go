@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/TaoOfNature/shop-go/internal/pkg/response"
-	"github.com/TaoOfNature/shop-go/internal/service"
+	"github.com/dawnstack/shop-go/internal/pkg/response"
+	"github.com/dawnstack/shop-go/internal/service"
 	"github.com/gin-gonic/gin"
 )
 

@@ -1,4 +1,4 @@
-module github.com/TaoOfNature/shop-go
+module github.com/dawnstack/shop-go
 
 go 1.25.5
 

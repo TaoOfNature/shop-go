@@ -9,11 +9,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/TaoOfNature/shop-go/internal/api"
-	"github.com/TaoOfNature/shop-go/internal/cache"
-	"github.com/TaoOfNature/shop-go/internal/config"
-	"github.com/TaoOfNature/shop-go/internal/repository"
-	"github.com/TaoOfNature/shop-go/internal/service"
+	"github.com/dawnstack/shop-go/internal/api"
+	"github.com/dawnstack/shop-go/internal/cache"
+	"github.com/dawnstack/shop-go/internal/config"
+	"github.com/dawnstack/shop-go/internal/repository"
+	"github.com/dawnstack/shop-go/internal/service"
 )
 
 func main() {

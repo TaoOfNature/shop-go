@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/TaoOfNature/shop-go/internal/config"
+	"github.com/dawnstack/shop-go/internal/config"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
