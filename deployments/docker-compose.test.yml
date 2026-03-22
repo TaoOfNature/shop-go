@@ -1,0 +1,64 @@
+services:
+  db:
+    image: bitnami/postgresql:latest
+    environment:
+      POSTGRESQL_USERNAME: ${DB_USER:-postgres}
+      POSTGRESQL_PASSWORD: ${DB_PASS:-postgres}
+      POSTGRESQL_DATABASE: ${DB_NAME:-mall}
+    ports:
+      - "54321:5432"
+    volumes:
+      - external_data:/bitnami/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-mall}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:8.6.1
+    ports:
+      - "6379:6379"
+    volumes:
+      - external_data:/redis/data
+    command: ["redis-server", "--appendonly", "yes"]
+
+  server:
+    image: golang:1.26.1
+    working_dir: /workspace
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      APP_PORT: "8080"
+      APP_ENV: docker-test
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASS: ${DB_PASS:-postgres}
+      DB_NAME: ${DB_NAME:-mall}
+      DB_SSLMODE: disable
+      REDIS_ADDR: redis:6379
+      JWT_SECRET: ${JWT_SECRET:-change-me}
+      GOPROXY: https://goproxy.cn,direct
+      GOPATH: /golang
+      GOMODCACHE: /golang/.pkg/mod
+      GOCACHE: /golang/.pkg/build
+    volumes:
+      - ..:/workspace
+      - external_data:/golang/.pkg
+    command: >
+      sh -c "
+        go mod tidy &&
+        go test ./... &&
+        go build -o /tmp/mall-server ./cmd/server &&
+        /tmp/mall-server
+      "
+    ports:
+      - "8080:8080"
+
+volumes:
+  external_data:
+    external: true
