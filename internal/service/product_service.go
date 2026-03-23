@@ -23,19 +23,14 @@ func (s *ProductService) Search(ctx context.Context, keyword string, sort string
 }
 
 func (s *ProductService) Detail(ctx context.Context, id int64) (*model.Product, error) {
-	if cached, ok := s.cache.Get(id); ok {
-		if product, ok := cached.(*model.Product); ok {
-			return product, nil
+	return s.cache.GetOrLoad(ctx, id, func(ctx context.Context) (*model.Product, error) {
+		product, err := s.products.GetByID(ctx, id)
+		if err != nil {
+			return nil, err
 		}
-	}
-
-	product, err := s.products.GetByID(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-	if product == nil {
-		return nil, errors.New("product not found")
-	}
-	s.cache.Set(id, product)
-	return product, nil
+		if product == nil {
+			return nil, errors.New("product not found")
+		}
+		return product, nil
+	})
 }

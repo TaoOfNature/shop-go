@@ -65,3 +65,8 @@ func (r *CartRepository) Delete(ctx context.Context, userID int64, id int64) err
 	_, err := getExecutor(ctx, r.db).ExecContext(ctx, `DELETE FROM cart_items WHERE id = $1 AND user_id = $2`, id, userID)
 	return err
 }
+
+func (r *CartRepository) DeleteCheckedByUserID(ctx context.Context, userID int64) error {
+	_, err := getExecutor(ctx, r.db).ExecContext(ctx, `DELETE FROM cart_items WHERE user_id = $1 AND checked = true`, userID)
+	return err
+}

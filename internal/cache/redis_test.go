@@ -1,37 +1,68 @@
 package cache
 
 import (
+	"context"
 	"testing"
 	"time"
 
+	"github.com/alicebob/miniredis/v2"
 	"github.com/dawnstack/shop-go/internal/config"
 )
 
-func TestRedisCacheSetGetDelete(t *testing.T) {
-	cache := NewRedisCache(config.RedisConfig{})
-	cache.Set("k", "v", 0)
+type testPayload struct {
+	Value string `json:"value"`
+}
 
-	value, ok := cache.Get("k")
+func TestRedisCacheSetGetDelete(t *testing.T) {
+	server := miniredis.RunT(t)
+	cache := NewRedisCache(config.RedisConfig{Addr: server.Addr()})
+	ctx := context.Background()
+
+	if err := cache.SetJSON(ctx, "k", testPayload{Value: "v"}, 0); err != nil {
+		t.Fatalf("SetJSON() error = %v", err)
+	}
+
+	var payload testPayload
+	ok, err := cache.GetJSON(ctx, "k", &payload)
+	if err != nil {
+		t.Fatalf("GetJSON() error = %v", err)
+	}
 	if !ok {
 		t.Fatal("expected key to exist")
 	}
-	if value.(string) != "v" {
-		t.Fatalf("unexpected value: %#v", value)
+	if payload.Value != "v" {
+		t.Fatalf("unexpected value: %#v", payload)
 	}
 
-	cache.Delete("k")
-	if _, ok := cache.Get("k"); ok {
+	if err := cache.Delete(ctx, "k"); err != nil {
+		t.Fatalf("Delete() error = %v", err)
+	}
+	ok, err = cache.GetJSON(ctx, "k", &payload)
+	if err != nil {
+		t.Fatalf("GetJSON() after delete error = %v", err)
+	}
+	if ok {
 		t.Fatal("expected key to be deleted")
 	}
 }
 
 func TestRedisCacheTTL(t *testing.T) {
-	cache := NewRedisCache(config.RedisConfig{})
-	cache.Set("k", "v", 10*time.Millisecond)
+	server := miniredis.RunT(t)
+	cache := NewRedisCache(config.RedisConfig{Addr: server.Addr()})
+	ctx := context.Background()
 
-	time.Sleep(30 * time.Millisecond)
+	if err := cache.SetJSON(ctx, "k", testPayload{Value: "v"}, 10*time.Millisecond); err != nil {
+		t.Fatalf("SetJSON() error = %v", err)
+	}
 
-	if _, ok := cache.Get("k"); ok {
+	server.FastForward(100 * time.Millisecond)
+
+	var payload testPayload
+	ok, err := cache.GetJSON(ctx, "k", &payload)
+	if err != nil {
+		t.Fatalf("GetJSON() error = %v", err)
+	}
+	if ok {
 		t.Fatal("expected key to expire")
 	}
 }

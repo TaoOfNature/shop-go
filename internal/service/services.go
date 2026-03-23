@@ -22,6 +22,7 @@ type Services struct {
 func NewServices(
 	repos *repository.Repositories,
 	txManager *repository.TxManager,
+	redisCache *cache.RedisCache,
 	productCache *cache.ProductCache,
 	homeCache *cache.HomeCache,
 	cfg config.Config,
@@ -40,7 +41,7 @@ func NewServices(
 		Address: NewAddressService(repos.Addresses, idGen),
 		Product: NewProductService(repos.Products, productCache),
 		Cart:    NewCartService(repos.Carts, repos.Products, idGen),
-		Order:   NewOrderService(repos.Orders, repos.Carts, repos.Products, txManager, idGen),
+		Order:   NewOrderService(repos.Orders, repos.Carts, repos.Products, txManager, idGen, redisCache),
 		Home:    NewHomeService(repos.Homes, homeCache),
 		Video:   NewVideoService(repos.Homes, homeCache),
 	}

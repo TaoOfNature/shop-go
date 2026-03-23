@@ -116,3 +116,20 @@ func (r *ProductRepository) GetByIDs(ctx context.Context, ids []int64) ([]model.
 	}
 	return products, rows.Err()
 }
+
+func (r *ProductRepository) DecreaseStock(ctx context.Context, productID int64, quantity int) (bool, error) {
+	result, err := getExecutor(ctx, r.db).ExecContext(ctx, `
+		UPDATE products
+		SET stock = stock - $2, sales = sales + $2, updated_at = NOW()
+		WHERE id = $1 AND deleted_at IS NULL AND stock >= $2
+	`, productID, quantity)
+	if err != nil {
+		return false, err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	return rowsAffected > 0, nil
+}

@@ -18,43 +18,13 @@ func NewHomeService(repo *repository.HomeRepository, cache *cache.HomeCache) *Ho
 }
 
 func (s *HomeService) Banners(ctx context.Context) ([]model.Banner, error) {
-	if cached, ok := s.cache.Get("banners"); ok {
-		if items, ok := cached.([]model.Banner); ok {
-			return items, nil
-		}
-	}
-	items, err := s.repo.ListBanners(ctx)
-	if err != nil {
-		return nil, err
-	}
-	s.cache.Set("banners", items)
-	return items, nil
+	return s.cache.GetOrLoadBanners(ctx, s.repo.ListBanners)
 }
 
 func (s *HomeService) Categories(ctx context.Context) ([]model.Category, error) {
-	if cached, ok := s.cache.Get("categories"); ok {
-		if items, ok := cached.([]model.Category); ok {
-			return items, nil
-		}
-	}
-	items, err := s.repo.ListCategories(ctx)
-	if err != nil {
-		return nil, err
-	}
-	s.cache.Set("categories", items)
-	return items, nil
+	return s.cache.GetOrLoadCategories(ctx, s.repo.ListCategories)
 }
 
 func (s *HomeService) Recommend(ctx context.Context) ([]model.Product, error) {
-	if cached, ok := s.cache.Get("recommend"); ok {
-		if items, ok := cached.([]model.Product); ok {
-			return items, nil
-		}
-	}
-	items, err := s.repo.ListRecommendations(ctx)
-	if err != nil {
-		return nil, err
-	}
-	s.cache.Set("recommend", items)
-	return items, nil
+	return s.cache.GetOrLoadRecommend(ctx, s.repo.ListRecommendations)
 }

@@ -28,11 +28,15 @@ func main() {
 	txManager := repository.NewTxManager(db)
 
 	redisCache := cache.NewRedisCache(cfg.Redis)
+	if err := redisCache.Ping(context.Background()); err != nil {
+		log.Fatalf("failed to connect redis: %v", err)
+	}
+
 	productCache := cache.NewProductCache(redisCache)
 	homeCache := cache.NewHomeCache(redisCache)
 
 	repos := repository.NewRepositories(db, txManager)
-	services := service.NewServices(repos, txManager, productCache, homeCache, cfg)
+	services := service.NewServices(repos, txManager, redisCache, productCache, homeCache, cfg)
 	router := api.NewRouter(services, cfg)
 
 	server := &http.Server{

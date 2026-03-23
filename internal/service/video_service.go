@@ -18,15 +18,5 @@ func NewVideoService(repo *repository.HomeRepository, cache *cache.HomeCache) *V
 }
 
 func (s *VideoService) Recommend(ctx context.Context) ([]model.Video, error) {
-	if cached, ok := s.cache.Get("videos"); ok {
-		if items, ok := cached.([]model.Video); ok {
-			return items, nil
-		}
-	}
-	items, err := s.repo.ListVideos(ctx)
-	if err != nil {
-		return nil, err
-	}
-	s.cache.Set("videos", items)
-	return items, nil
+	return s.cache.GetOrLoadVideos(ctx, s.repo.ListVideos)
 }

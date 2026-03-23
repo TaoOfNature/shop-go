@@ -1,55 +1,57 @@
 package cache
 
 import (
-	"sync"
+	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/dawnstack/shop-go/internal/config"
+	"github.com/redis/go-redis/v9"
 )
 
 type RedisCache struct {
-	mu    sync.RWMutex
-	items map[string]cacheItem
+	client *redis.Client
 }
 
-type cacheItem struct {
-	value     interface{}
-	expiresAt time.Time
+func NewRedisCache(cfg config.RedisConfig) *RedisCache {
+	client := redis.NewClient(&redis.Options{
+		Addr:     cfg.Addr,
+		Password: cfg.Password,
+		DB:       cfg.Database,
+	})
+	return &RedisCache{client: client}
 }
 
-func NewRedisCache(_ config.RedisConfig) *RedisCache {
-	return &RedisCache{items: make(map[string]cacheItem)}
+func (c *RedisCache) Ping(ctx context.Context) error {
+	return c.client.Ping(ctx).Err()
 }
 
-func (c *RedisCache) Get(key string) (interface{}, bool) {
-	c.mu.RLock()
-	item, ok := c.items[key]
-	c.mu.RUnlock()
-	if !ok {
-		return nil, false
+func (c *RedisCache) GetJSON(ctx context.Context, key string, dest interface{}) (bool, error) {
+	value, err := c.client.Get(ctx, key).Result()
+	if err == redis.Nil {
+		return false, nil
 	}
-	if !item.expiresAt.IsZero() && time.Now().After(item.expiresAt) {
-		c.mu.Lock()
-		delete(c.items, key)
-		c.mu.Unlock()
-		return nil, false
+	if err != nil {
+		return false, err
 	}
-	return item.value, true
+	if err := json.Unmarshal([]byte(value), dest); err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
-func (c *RedisCache) Set(key string, value interface{}, ttl time.Duration) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	item := cacheItem{value: value}
-	if ttl > 0 {
-		item.expiresAt = time.Now().Add(ttl)
+func (c *RedisCache) SetJSON(ctx context.Context, key string, value interface{}, ttl time.Duration) error {
+	bytes, err := json.Marshal(value)
+	if err != nil {
+		return err
 	}
-	c.items[key] = item
+	return c.client.Set(ctx, key, bytes, ttl).Err()
 }
 
-func (c *RedisCache) Delete(key string) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	delete(c.items, key)
+func (c *RedisCache) Delete(ctx context.Context, key string) error {
+	return c.client.Del(ctx, key).Err()
+}
+
+func (c *RedisCache) SetNX(ctx context.Context, key string, value interface{}, ttl time.Duration) (bool, error) {
+	return c.client.SetNX(ctx, key, value, ttl).Result()
 }
