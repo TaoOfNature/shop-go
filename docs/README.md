@@ -5,6 +5,7 @@
 - Main API prefix: `/api`
 - Progress tracker: `docs/STATUS.md`
 - Pending tracker: `docs/PENDING.md`
+- Mobile API doc: `docs/API.md`
 - Docker test compose: `deployments/docker-compose.test.yml`
 
 ## Test Compose Persistence
