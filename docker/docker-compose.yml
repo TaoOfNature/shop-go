@@ -21,7 +21,7 @@ services:
       retries: 5
 
   redis:
-    image: redis:8-alpine
+    image: crpi-57t10gj4eavw45nx-vpc.cn-beijing.personal.cr.aliyuncs.com/bey0nd/redis:8.6.1
     container_name: redis
     networks:
       - internal_network
