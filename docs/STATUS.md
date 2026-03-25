@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-03-23
+Last updated: 2026-03-25
 
 ## Completed
 
@@ -23,6 +23,7 @@ Last updated: 2026-03-23
   - logger / recovery / auth / rate-limit middleware
 - Added Redis-backed cache storage for product and home/video data.
 - Added `singleflight` protection for product detail and home-feed cache loading.
+- Added background cache prewarming for home and video data.
 - Finished the core order transaction flow:
   - idempotency lock with Redis `SETNX` + TTL
   - stock deduction inside the database transaction
@@ -39,6 +40,8 @@ Last updated: 2026-03-23
 - Added initial PostgreSQL schema migrations under `migrations/`.
 - Updated Docker and CI entrypoints to use `cmd/server`.
 - Added lightweight unit tests for packages that do not need database or external containers.
+- Added mobile-facing API documentation in `docs/API.md`.
+- Added machine-readable OpenAPI spec in `docs/openapi.yaml`.
 
 ## Current Behavior
 
@@ -82,5 +85,5 @@ Last updated: 2026-03-23
 
 - Next priority items:
   - add repository and order integration tests
-  - add cache prewarming scheduler
-  - generate Swagger docs
+  - add observability
+  - continue recommendation and seckill evolution

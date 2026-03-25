@@ -1,0 +1,819 @@
+openapi: 3.0.3
+info:
+  title: Shop Go API
+  version: 0.1.0
+  description: Current implemented API for mobile and frontend integration.
+servers:
+  - url: http://localhost:8080
+tags:
+  - name: Auth
+  - name: User
+  - name: Address
+  - name: Product
+  - name: Cart
+  - name: Order
+  - name: Home
+  - name: Video
+  - name: Health
+paths:
+  /ping:
+    get:
+      tags: [Health]
+      summary: Health check
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeHealth'
+  /api/auth/register:
+    post:
+      tags: [Auth]
+      summary: Register user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeAuthTokens'
+  /api/auth/login:
+    post:
+      tags: [Auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeAuthTokens'
+  /api/auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Refresh token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeAuthTokens'
+  /api/user/profile:
+    get:
+      tags: [User]
+      summary: Get current user profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeUser'
+    put:
+      tags: [User]
+      summary: Update current user profile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeBoolUpdated'
+  /api/user/addresses:
+    get:
+      tags: [Address]
+      summary: List current user addresses
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeAddressList'
+  /api/user/address:
+    post:
+      tags: [Address]
+      summary: Create address
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddressRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeBoolCreated'
+    delete:
+      tags: [Address]
+      summary: Delete address
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeBoolDeleted'
+  /api/user/address/{id}:
+    put:
+      tags: [Address]
+      summary: Update address
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddressRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeBoolUpdated'
+  /api/products/search:
+    get:
+      tags: [Product]
+      summary: Search products
+      parameters:
+        - in: query
+          name: keyword
+          schema:
+            type: string
+        - in: query
+          name: sort
+          schema:
+            type: string
+            enum: [price_asc, price_desc, sales]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeProductList'
+  /api/products/{id}:
+    get:
+      tags: [Product]
+      summary: Get product detail
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeProduct'
+  /api/cart:
+    get:
+      tags: [Cart]
+      summary: List cart items
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeCartItemList'
+    post:
+      tags: [Cart]
+      summary: Add to cart
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddCartRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeBoolCreated'
+    delete:
+      tags: [Cart]
+      summary: Delete cart item
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeBoolDeleted'
+  /api/cart/{id}:
+    put:
+      tags: [Cart]
+      summary: Update cart item
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCartRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeBoolUpdated'
+  /api/orders:
+    get:
+      tags: [Order]
+      summary: List current user orders
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeOrderList'
+    post:
+      tags: [Order]
+      summary: Create order from checked cart items
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeOrder'
+  /api/orders/{id}:
+    get:
+      tags: [Order]
+      summary: Get order detail
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeOrder'
+  /api/home/banners:
+    get:
+      tags: [Home]
+      summary: List banners
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeBannerList'
+  /api/home/categories:
+    get:
+      tags: [Home]
+      summary: List categories
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeCategoryList'
+  /api/home/recommend:
+    get:
+      tags: [Home]
+      summary: List recommended products
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeProductList'
+  /api/videos/recommend:
+    get:
+      tags: [Video]
+      summary: List recommended videos
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeVideoList'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    EnvelopeBase:
+      type: object
+      properties:
+        code:
+          type: integer
+        msg:
+          type: string
+    Health:
+      type: object
+      properties:
+        service:
+          type: string
+        env:
+          type: string
+    EnvelopeHealth:
+      allOf:
+        - $ref: '#/components/schemas/EnvelopeBase'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Health'
+    RegisterRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        nickname:
+          type: string
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+    RefreshRequest:
+      type: object
+      required: [refresh_token]
+      properties:
+        refresh_token:
+          type: string
+    UpdateProfileRequest:
+      type: object
+      properties:
+        nickname:
+          type: string
+        avatar_url:
+          type: string
+    AddressRequest:
+      type: object
+      required: [receiver_name, phone, province, city, district, detail]
+      properties:
+        receiver_name:
+          type: string
+        phone:
+          type: string
+        province:
+          type: string
+        city:
+          type: string
+        district:
+          type: string
+        detail:
+          type: string
+        is_default:
+          type: boolean
+    AddCartRequest:
+      type: object
+      required: [product_id, quantity]
+      properties:
+        product_id:
+          type: integer
+          format: int64
+        quantity:
+          type: integer
+        checked:
+          type: boolean
+    UpdateCartRequest:
+      type: object
+      required: [quantity]
+      properties:
+        quantity:
+          type: integer
+        checked:
+          type: boolean
+    CreateOrderRequest:
+      type: object
+      required: [address_id, idempotency_key]
+      properties:
+        address_id:
+          type: integer
+          format: int64
+        idempotency_key:
+          type: string
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        email:
+          type: string
+        nickname:
+          type: string
+        avatar_url:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    Address:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        user_id:
+          type: integer
+          format: int64
+        receiver_name:
+          type: string
+        phone:
+          type: string
+        province:
+          type: string
+        city:
+          type: string
+        district:
+          type: string
+        detail:
+          type: string
+        is_default:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        category_id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: integer
+          format: int64
+        stock:
+          type: integer
+        cover_url:
+          type: string
+        sales:
+          type: integer
+        tags:
+          type: array
+          items:
+            type: string
+    CartItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        user_id:
+          type: integer
+          format: int64
+        product_id:
+          type: integer
+          format: int64
+        quantity:
+          type: integer
+        checked:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    OrderItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        order_id:
+          type: integer
+          format: int64
+        product_id:
+          type: integer
+          format: int64
+        product_name:
+          type: string
+        product_price:
+          type: integer
+          format: int64
+        quantity:
+          type: integer
+    Order:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        user_id:
+          type: integer
+          format: int64
+        address_id:
+          type: integer
+          format: int64
+        order_no:
+          type: string
+        status:
+          type: string
+        total_amount:
+          type: integer
+          format: int64
+        idempotency_key:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+    Banner:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        image_url:
+          type: string
+        link_url:
+          type: string
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        icon_url:
+          type: string
+        sort_order:
+          type: integer
+    Video:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        cover_url:
+          type: string
+        playback_url:
+          type: string
+        product_id:
+          type: integer
+          format: int64
+    AuthTokens:
+      type: object
+      properties:
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+        user:
+          $ref: '#/components/schemas/User'
+    EnvelopeAuthTokens:
+      allOf:
+        - $ref: '#/components/schemas/EnvelopeBase'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/AuthTokens'
+    EnvelopeUser:
+      allOf:
+        - $ref: '#/components/schemas/EnvelopeBase'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/User'
+    EnvelopeAddressList:
+      allOf:
+        - $ref: '#/components/schemas/EnvelopeBase'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Address'
+    EnvelopeProductList:
+      allOf:
+        - $ref: '#/components/schemas/EnvelopeBase'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Product'
+    EnvelopeProduct:
+      allOf:
+        - $ref: '#/components/schemas/EnvelopeBase'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Product'
+    EnvelopeCartItemList:
+      allOf:
+        - $ref: '#/components/schemas/EnvelopeBase'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/CartItem'
+    EnvelopeOrderList:
+      allOf:
+        - $ref: '#/components/schemas/EnvelopeBase'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Order'
+    EnvelopeOrder:
+      allOf:
+        - $ref: '#/components/schemas/EnvelopeBase'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Order'
+    EnvelopeBannerList:
+      allOf:
+        - $ref: '#/components/schemas/EnvelopeBase'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Banner'
+    EnvelopeCategoryList:
+      allOf:
+        - $ref: '#/components/schemas/EnvelopeBase'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Category'
+    EnvelopeVideoList:
+      allOf:
+        - $ref: '#/components/schemas/EnvelopeBase'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Video'
+    EnvelopeBoolCreated:
+      allOf:
+        - $ref: '#/components/schemas/EnvelopeBase'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                created:
+                  type: boolean
+    EnvelopeBoolUpdated:
+      allOf:
+        - $ref: '#/components/schemas/EnvelopeBase'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                updated:
+                  type: boolean
+    EnvelopeBoolDeleted:
+      allOf:
+        - $ref: '#/components/schemas/EnvelopeBase'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                deleted:
+                  type: boolean

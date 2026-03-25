@@ -6,6 +6,7 @@
 - Progress tracker: `docs/STATUS.md`
 - Pending tracker: `docs/PENDING.md`
 - Mobile API doc: `docs/API.md`
+- OpenAPI spec: `docs/openapi.yaml`
 - Docker test compose: `deployments/docker-compose.test.yml`
 
 ## Test Compose Persistence

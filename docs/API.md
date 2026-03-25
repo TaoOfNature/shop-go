@@ -1,11 +1,12 @@
 # Mobile API Doc
 
-Last updated: 2026-03-23
+Last updated: 2026-03-25
 
 ## Status
 
 - 当前代码里已经暴露的接口，本文档都已覆盖。
 - 这是“当前可对接版本”文档，不包含设计稿里尚未实现的未来接口。
+- 机器可读版本见 `docs/openapi.yaml`
 
 ## Base Info
 

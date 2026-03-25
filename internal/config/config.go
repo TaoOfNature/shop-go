@@ -18,6 +18,7 @@ type AppConfig struct {
 	Port           string
 	RateLimitRPS   int
 	RateLimitBurst int
+	PrewarmSeconds int
 }
 
 type DatabaseConfig struct {
@@ -50,6 +51,7 @@ func Load() Config {
 			Port:           getenv("APP_PORT", "8080"),
 			RateLimitRPS:   getenvInt("RATE_LIMIT_RPS", 10),
 			RateLimitBurst: getenvInt("RATE_LIMIT_BURST", 20),
+			PrewarmSeconds: getenvInt("CACHE_PREWARM_SECONDS", 300),
 		},
 		Database: DatabaseConfig{
 			Host:     getenv("DB_HOST", "127.0.0.1"),

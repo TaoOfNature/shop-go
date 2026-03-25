@@ -1,12 +1,10 @@
 # Remaining Work
 
-Last updated: 2026-03-23
+Last updated: 2026-03-25
 
 ## Not Finished Yet
 
-- Home cache prewarming scheduler is not implemented yet.
 - Repository methods do not yet have integration tests against real PostgreSQL / Redis containers.
-- Swagger output under `docs/` has not been generated.
 - Observability items from the design doc are still pending:
   - metrics
   - tracing
@@ -27,6 +25,6 @@ Last updated: 2026-03-23
 
 1. Get the project building locally with Go installed.
 2. Add integration tests.
-3. Add cache prewarming.
-4. Add Swagger and observability.
-5. Continue with recommendation and seckill evolution.
+3. Add observability.
+4. Continue with recommendation and seckill evolution.
+5. Consider seckill / Kafka architecture when the business path is stable.

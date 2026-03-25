@@ -28,3 +28,16 @@ func (s *HomeService) Categories(ctx context.Context) ([]model.Category, error) 
 func (s *HomeService) Recommend(ctx context.Context) ([]model.Product, error) {
 	return s.cache.GetOrLoadRecommend(ctx, s.repo.ListRecommendations)
 }
+
+func (s *HomeService) Prewarm(ctx context.Context) error {
+	if _, err := s.Banners(ctx); err != nil {
+		return err
+	}
+	if _, err := s.Categories(ctx); err != nil {
+		return err
+	}
+	if _, err := s.Recommend(ctx); err != nil {
+		return err
+	}
+	return nil
+}

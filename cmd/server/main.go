@@ -48,6 +48,8 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
+	service.StartCacheWarmup(ctx, services, cfg)
+
 	go func() {
 		log.Printf("mall backend listening on :%s", cfg.App.Port)
 		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
