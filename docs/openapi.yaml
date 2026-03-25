@@ -14,7 +14,9 @@ tags:
   - name: Order
   - name: Home
   - name: Video
+  - name: Seckill
   - name: Health
+  - name: Observability
 paths:
   /ping:
     get:
@@ -27,6 +29,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EnvelopeHealth'
+  /metrics:
+    get:
+      tags: [Observability]
+      summary: Prometheus metrics endpoint
+      responses:
+        '200':
+          description: Prometheus metrics text output
   /api/auth/register:
     post:
       tags: [Auth]
@@ -385,6 +394,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EnvelopeProductList'
+  /api/home/recommend/personalized:
+    get:
+      tags: [Home]
+      summary: Personalized product recommendations
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeProductList'
   /api/videos/recommend:
     get:
       tags: [Video]
@@ -396,6 +418,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EnvelopeVideoList'
+  /api/seckill/orders:
+    post:
+      tags: [Seckill]
+      summary: Submit seckill order
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSeckillOrderRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeSeckillSubmitResult'
 components:
   securitySchemes:
     bearerAuth:
@@ -498,6 +539,20 @@ components:
       type: object
       required: [address_id, idempotency_key]
       properties:
+        address_id:
+          type: integer
+          format: int64
+        idempotency_key:
+          type: string
+    CreateSeckillOrderRequest:
+      type: object
+      required: [product_id, quantity, address_id, idempotency_key]
+      properties:
+        product_id:
+          type: integer
+          format: int64
+        quantity:
+          type: integer
         address_id:
           type: integer
           format: int64
@@ -696,6 +751,15 @@ components:
           type: string
         user:
           $ref: '#/components/schemas/User'
+    SeckillSubmitResult:
+      type: object
+      properties:
+        queued:
+          type: boolean
+        message_id:
+          type: string
+        order:
+          $ref: '#/components/schemas/Order'
     EnvelopeAuthTokens:
       allOf:
         - $ref: '#/components/schemas/EnvelopeBase'
@@ -787,6 +851,13 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/Video'
+    EnvelopeSeckillSubmitResult:
+      allOf:
+        - $ref: '#/components/schemas/EnvelopeBase'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/SeckillSubmitResult'
     EnvelopeBoolCreated:
       allOf:
         - $ref: '#/components/schemas/EnvelopeBase'

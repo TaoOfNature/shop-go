@@ -16,6 +16,7 @@ Last updated: 2026-03-25
 - API prefix: `/api`
 - Content-Type: `application/json`
 - Auth scheme: `Authorization: Bearer <access_token>`
+- Metrics endpoint: `/metrics`
 
 ## Unified Response
 
@@ -538,6 +539,19 @@ Last updated: 2026-03-25
 
 成功响应 `data`：商品数组，字段同商品搜索接口
 
+### GET `/api/home/recommend/personalized`
+
+说明：个性化推荐
+
+需要登录：是
+
+当前策略：
+
+- 优先使用用户历史订单里的偏好类目做推荐
+- 如果用户没有历史订单，则回退到通用热门推荐
+
+成功响应 `data`：商品数组，字段同商品搜索接口
+
 ## Video
 
 ### GET `/api/videos/recommend`
@@ -556,6 +570,65 @@ Last updated: 2026-03-25
     "product_id": 1001
   }
 ]
+
+## Seckill
+
+### POST `/api/seckill/orders`
+
+说明：秒杀下单入口
+
+需要登录：是
+
+请求体：
+
+```json
+{
+  "product_id": 1001,
+  "quantity": 1,
+  "address_id": 10,
+  "idempotency_key": "seckill-20260325-1"
+}
+```
+
+说明：
+
+- `product_id`: 秒杀商品 ID
+- `quantity`: 数量，当前建议传 `1`
+- `address_id`: 收货地址 ID
+- `idempotency_key`: 必填，防重复提交
+
+成功响应 `data`：
+
+```json
+{
+  "queued": false,
+  "message_id": "SQ123456789",
+  "order": {
+    "id": 1,
+    "user_id": 1,
+    "address_id": 10,
+    "order_no": "SK202603251200001",
+    "status": "pending",
+    "total_amount": 19900,
+    "idempotency_key": "seckill-20260325-1",
+    "items": [
+      {
+        "id": 11,
+        "order_id": 1,
+        "product_id": 1001,
+        "product_name": "秒杀商品",
+        "product_price": 19900,
+        "quantity": 1
+      }
+    ]
+  }
+}
+```
+
+补充：
+
+- 当 `KAFKA_ENABLED=false` 时，当前服务会同步创建订单，`queued=false`
+- 当 `KAFKA_ENABLED=true` 时，消息会投递到 Kafka，再由后台消费者处理，此时可根据 `message_id` 和订单列表轮询结果
 ```
 
 ## Health Check
@@ -572,6 +645,15 @@ Last updated: 2026-03-25
   "env": "dev"
 }
 ```
+
+### GET `/metrics`
+
+说明：Prometheus 指标接口
+
+用途：
+
+- 供监控系统抓取
+- 不用于移动端业务调用
 
 ## Error Handling
 

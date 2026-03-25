@@ -4,13 +4,7 @@ Last updated: 2026-03-25
 
 ## Not Finished Yet
 
-- Repository methods do not yet have integration tests against real PostgreSQL / Redis containers.
-- Observability items from the design doc are still pending:
-  - metrics
-  - tracing
-  - structured log sink integration
-- Kafka / seckill architecture is not implemented.
-- Recommendation-system evolution path is not implemented.
+- None in the original remaining-work list.
 
 ## Quality Follow-Ups
 
@@ -24,7 +18,7 @@ Last updated: 2026-03-25
 ## Suggested Order
 
 1. Get the project building locally with Go installed.
-2. Add integration tests.
-3. Add observability.
-4. Continue with recommendation and seckill evolution.
-5. Consider seckill / Kafka architecture when the business path is stable.
+2. Expand integration and service test coverage.
+3. Improve recommendation quality with richer user signals.
+4. Add Kafka deployment and operations configs when enabling it in an environment.
+5. Add seed data and business fixtures.

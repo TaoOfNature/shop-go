@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"log"
+	"log/slog"
 	"net/http"
 
 	"github.com/dawnstack/shop-go/internal/pkg/response"
@@ -10,7 +10,7 @@ import (
 
 func Recovery() gin.HandlerFunc {
 	return gin.CustomRecovery(func(c *gin.Context, recovered interface{}) {
-		log.Printf("panic recovered: %v", recovered)
+		slog.Error("panic recovered", "error", recovered)
 		response.Error(c, http.StatusInternalServerError, 1000, "internal server error")
 	})
 }

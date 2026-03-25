@@ -9,12 +9,19 @@ import (
 	"github.com/dawnstack/shop-go/internal/pkg/response"
 	"github.com/dawnstack/shop-go/internal/service"
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func NewRouter(services *service.Services, cfg config.Config) *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
-	r.Use(middleware.Logger(), middleware.Recovery(), middleware.RateLimit(cfg.App.RateLimitRPS, cfg.App.RateLimitBurst))
+	r.Use(
+		middleware.Metrics(),
+		middleware.Tracing(),
+		middleware.Logger(),
+		middleware.Recovery(),
+		middleware.RateLimit(cfg.App.RateLimitRPS, cfg.App.RateLimitBurst),
+	)
 
 	authHandler := handler.NewAuthHandler(services.Auth)
 	userHandler := handler.NewUserHandler(services.User)
@@ -24,10 +31,13 @@ func NewRouter(services *service.Services, cfg config.Config) *gin.Engine {
 	orderHandler := handler.NewOrderHandler(services.Order)
 	homeHandler := handler.NewHomeHandler(services.Home)
 	videoHandler := handler.NewVideoHandler(services.Video)
+	recommendHandler := handler.NewRecommendHandler(services.Home)
+	seckillHandler := handler.NewSeckillHandler(services.Seckill)
 
 	r.GET("/ping", func(c *gin.Context) {
 		response.Success(c, gin.H{"service": cfg.App.Name, "env": cfg.App.Env})
 	})
+	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	apiGroup := r.Group("/api")
 	{
@@ -63,6 +73,9 @@ func NewRouter(services *service.Services, cfg config.Config) *gin.Engine {
 		secured.GET("/orders", orderHandler.List)
 		secured.GET("/orders/:id", orderHandler.Detail)
 		secured.POST("/orders", orderHandler.Create)
+
+		secured.GET("/home/recommend/personalized", recommendHandler.Personalized)
+		secured.POST("/seckill/orders", seckillHandler.CreateOrder)
 	}
 
 	r.NoRoute(func(c *gin.Context) {

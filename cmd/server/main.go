@@ -12,18 +12,33 @@ import (
 	"github.com/dawnstack/shop-go/internal/api"
 	"github.com/dawnstack/shop-go/internal/cache"
 	"github.com/dawnstack/shop-go/internal/config"
+	"github.com/dawnstack/shop-go/internal/observability"
 	"github.com/dawnstack/shop-go/internal/repository"
 	"github.com/dawnstack/shop-go/internal/service"
+	"github.com/dawnstack/shop-go/internal/mq"
 )
 
 func main() {
 	cfg := config.Load()
+	observability.SetupLogger()
+
+	shutdownTracing, err := observability.SetupTracing(cfg.App.Name, cfg.App.Env)
+	if err != nil {
+		log.Fatalf("failed to setup tracing: %v", err)
+	}
+	defer func() {
+		_ = shutdownTracing(context.Background())
+	}()
 
 	db, err := repository.NewDB(cfg.Database)
 	if err != nil {
 		log.Fatalf("failed to connect database: %v", err)
 	}
 	defer db.Close()
+
+	if err := repository.RunMigrations(db, "migrations"); err != nil {
+		log.Fatalf("failed to run migrations: %v", err)
+	}
 
 	txManager := repository.NewTxManager(db)
 
@@ -49,6 +64,7 @@ func main() {
 	defer stop()
 
 	service.StartCacheWarmup(ctx, services, cfg)
+	mq.StartSeckillConsumer(ctx, cfg.Kafka, services.Seckill.HandleMessage)
 
 	go func() {
 		log.Printf("mall backend listening on :%s", cfg.App.Port)

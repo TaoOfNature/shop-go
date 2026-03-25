@@ -24,6 +24,10 @@ Last updated: 2026-03-25
 - Added Redis-backed cache storage for product and home/video data.
 - Added `singleflight` protection for product detail and home-feed cache loading.
 - Added background cache prewarming for home and video data.
+- Added observability basics:
+  - structured JSON logs
+  - Prometheus metrics endpoint
+  - OpenTelemetry HTTP tracing
 - Finished the core order transaction flow:
   - idempotency lock with Redis `SETNX` + TTL
   - stock deduction inside the database transaction
@@ -42,6 +46,9 @@ Last updated: 2026-03-25
 - Added lightweight unit tests for packages that do not need database or external containers.
 - Added mobile-facing API documentation in `docs/API.md`.
 - Added machine-readable OpenAPI spec in `docs/openapi.yaml`.
+- Added personalized recommendation endpoint based on user order history.
+- Added seckill order architecture with inline mode and Kafka-backed async mode.
+- Added repository integration tests for PostgreSQL-backed repository behavior.
 
 ## Current Behavior
 
@@ -84,6 +91,5 @@ Last updated: 2026-03-25
 ## Immediate Next Step
 
 - Next priority items:
-  - add repository and order integration tests
-  - add observability
-  - continue recommendation and seckill evolution
+  - expand integration coverage across more repository and service flows
+  - refine recommendation quality and seckill operations for business tuning

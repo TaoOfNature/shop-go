@@ -29,6 +29,17 @@ func (s *HomeService) Recommend(ctx context.Context) ([]model.Product, error) {
 	return s.cache.GetOrLoadRecommend(ctx, s.repo.ListRecommendations)
 }
 
+func (s *HomeService) PersonalizedRecommend(ctx context.Context, userID int64) ([]model.Product, error) {
+	items, err := s.repo.ListPersonalizedRecommendations(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	if len(items) == 0 {
+		return s.Recommend(ctx)
+	}
+	return items, nil
+}
+
 func (s *HomeService) Prewarm(ctx context.Context) error {
 	if _, err := s.Banners(ctx); err != nil {
 		return err

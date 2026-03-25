@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/dawnstack/shop-go/internal/cache"
 	"github.com/dawnstack/shop-go/internal/config"
+	"github.com/dawnstack/shop-go/internal/mq"
 	"github.com/dawnstack/shop-go/internal/pkg/auth"
 	"github.com/dawnstack/shop-go/internal/pkg/snowflake"
 	"github.com/dawnstack/shop-go/internal/repository"
@@ -17,6 +18,7 @@ type Services struct {
 	Order   *OrderService
 	Home    *HomeService
 	Video   *VideoService
+	Seckill *SeckillService
 }
 
 func NewServices(
@@ -34,6 +36,11 @@ func NewServices(
 		cfg.JWT.RefreshExpireHour,
 	)
 	idGen := snowflake.New(1)
+	seckill := NewSeckillService(cfg.Kafka, repos.Products, repos.Orders, txManager, idGen, redisCache)
+	if cfg.Kafka.Enabled {
+		publisher := mq.NewKafkaPublisher(cfg.Kafka)
+		seckill.SetPublisher(publisher)
+	}
 
 	return &Services{
 		Auth:    NewAuthService(repos.Users, idGen, jwtManager),
@@ -44,5 +51,6 @@ func NewServices(
 		Order:   NewOrderService(repos.Orders, repos.Carts, repos.Products, txManager, idGen, redisCache),
 		Home:    NewHomeService(repos.Homes, homeCache),
 		Video:   NewVideoService(repos.Homes, homeCache),
+		Seckill: seckill,
 	}
 }

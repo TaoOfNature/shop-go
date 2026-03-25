@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"strings"
 	"strconv"
 )
 
@@ -10,6 +11,7 @@ type Config struct {
 	Database DatabaseConfig
 	Redis    RedisConfig
 	JWT      JWTConfig
+	Kafka    KafkaConfig
 }
 
 type AppConfig struct {
@@ -43,6 +45,13 @@ type JWTConfig struct {
 	RefreshExpireHour int
 }
 
+type KafkaConfig struct {
+	Enabled bool
+	Brokers []string
+	Topic   string
+	GroupID string
+}
+
 func Load() Config {
 	return Config{
 		App: AppConfig{
@@ -72,6 +81,12 @@ func Load() Config {
 			AccessExpireMin:   getenvInt("JWT_ACCESS_EXPIRE_MIN", 120),
 			RefreshExpireHour: getenvInt("JWT_REFRESH_EXPIRE_HOUR", 168),
 		},
+		Kafka: KafkaConfig{
+			Enabled: getenv("KAFKA_ENABLED", "false") == "true",
+			Brokers: splitCSV(getenv("KAFKA_BROKERS", "127.0.0.1:9092")),
+			Topic:   getenv("KAFKA_TOPIC", "shop-go-seckill"),
+			GroupID: getenv("KAFKA_GROUP_ID", "shop-go-seckill-consumer"),
+		},
 	}
 }
 
@@ -93,4 +108,19 @@ func getenvInt(key string, fallback int) int {
 		return fallback
 	}
 	return number
+}
+
+func splitCSV(value string) []string {
+	parts := strings.Split(value, ",")
+	result := make([]string, 0, len(parts))
+	for _, part := range parts {
+		part = strings.TrimSpace(part)
+		if part != "" {
+			result = append(result, part)
+		}
+	}
+	if len(result) == 0 {
+		return []string{"127.0.0.1:9092"}
+	}
+	return result
 }
